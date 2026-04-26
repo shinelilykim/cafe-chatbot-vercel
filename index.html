@@ -186,7 +186,7 @@
 
     <script>
       // ✅ 여기만 본인 Apps Script 웹앱 URL로 교체!
-      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgcaGrRqLfWOTAGk3Cn7R7jNxJDREibcbsmexuz-Kc8xdW7zxaauFEixOs1OWxkpxp/exec'; // 예: https://script.google.com/macros/s/XXX/exec
+      cconst APPS_SCRIPT_URL = '/api/chat'; // 예: https://script.google.com/macros/s/XXX/exec
 
       const chat = document.getElementById('chat');
       const form = document.getElementById('input-area');
@@ -207,15 +207,16 @@
         'bot'
       );
 
-      async function callBackend(question) {
-        const url = APPS_SCRIPT_URL + '?q=' + encodeURIComponent(question);
-        const res = await fetch(url);
-        if (!res.ok) {
-          throw new Error('백엔드 호출 실패: ' + res.status);
-        }
-        const data = await res.json();
-        return data.answer;
-      }
+async function callBackend(question) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: question })
+  });
+  if (!res.ok) throw new Error('호출 실패: ' + res.status);
+  const data = await res.json();
+  return data.answer;
+}
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
