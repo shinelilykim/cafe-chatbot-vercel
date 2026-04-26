@@ -8,11 +8,27 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      GAS_URL + '?q=' + encodeURIComponent(question)
+      GAS_URL + '?q=' + encodeURIComponent(question),
+      {
+        redirect: 'follow',  // ← 리다이렉트 자동 따라가기
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
-    const data = await response.json();
+
+    const text = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return res.status(500).json({ error: '응답 파싱 실패', raw: text });
+    }
+
     res.status(200).json({ answer: data.answer });
+
   } catch (error) {
-    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+    res.status(500).json({ error: error.message });
   }
 }
